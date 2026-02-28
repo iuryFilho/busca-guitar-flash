@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Login Admin{% endblock %}
+
+{% block content %}
+    <main class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-7 col-lg-5">
+          <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+              <h1 class="h4 mb-3">Login administrativo</h1>
+              <p class="mb-4"><a href="{{ url_for('index') }}">Voltar para busca</a></p>
+
+              {% if error %}
+                <div class="alert alert-danger" role="alert">{{ error }}</div>
+              {% endif %}
+
+              <form method="post" action="{{ url_for('admin_login') }}" class="d-grid gap-3">
+                <input type="hidden" name="next" value="{{ next_url }}" />
+                <div>
+                  <label class="form-label">Usuário</label>
+                  <input type="text" name="username" class="form-control" required />
+                </div>
+                <div>
+                  <label class="form-label">Senha</label>
+                  <input type="password" name="password" class="form-control" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Entrar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+{% endblock %}

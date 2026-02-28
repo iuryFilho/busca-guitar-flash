@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Atualizar lista{% endblock %}
+
+{% block content %}
+    <main class="container py-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Atualizar lista de músicas</h1>
+        <div class="d-flex gap-3">
+          <a href="{{ url_for('index') }}">Voltar para busca</a>
+          <a class="link-danger" href="{{ url_for('admin_logout') }}">Sair</a>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <p class="mb-3">Total atual em arquivo: <strong>{{ current_total }}</strong></p>
+
+          {% if message %}
+            <div class="alert alert-success" role="alert">{{ message }}</div>
+          {% endif %}
+          {% if error %}
+            <div class="alert alert-danger" role="alert">{{ error }}</div>
+          {% endif %}
+
+          <form method="post" action="{{ url_for('admin_update') }}" class="row g-3 align-items-end">
+            <div class="col-12 col-sm-8 col-md-6">
+              <label class="form-label">Quantidade de páginas para consultar</label>
+              <input type="number" min="1" name="pages" value="10" class="form-control" required />
+            </div>
+            <div class="col-12 col-sm-4 col-md-auto">
+              <button type="submit" class="btn btn-primary w-100">Atualizar agora</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+{% endblock %}
