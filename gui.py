@@ -4,7 +4,7 @@ from typing import Iterable
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import cli
+import busca_guitar_flash
 
 
 class RequeryWorker(QtCore.QObject):
@@ -19,19 +19,19 @@ class RequeryWorker(QtCore.QObject):
     def run(self):
         try:
             songs = set()
-            for page in cli.inf_gen(self.pages):
-                html = cli.fetch_song_list_html(page)
+            for page in busca_guitar_flash.inf_gen(self.pages):
+                html = busca_guitar_flash.fetch_song_list_html(page)
                 if not html:
                     break
 
-                page_songs = cli.get_song_set(html)
+                page_songs = busca_guitar_flash.get_song_set(html)
                 if not page_songs:
                     break
 
                 songs.update(page_songs)
 
             if songs:
-                cli.save_song_set(songs)
+                busca_guitar_flash.save_song_set(songs)
             self.finished.emit(songs)
         except Exception as exc:  # pragma: no cover
             self.error.emit(str(exc))
@@ -114,8 +114,8 @@ class GuitarFlashSearchWindow(QtWidgets.QMainWindow):
         root_layout.addWidget(self.table)
 
     def _load_song_set(self):
-        if os.path.exists(cli.CSV_PATH):
-            self.song_set = cli.load_song_set()
+        if os.path.exists(busca_guitar_flash.CSV_PATH):
+            self.song_set = busca_guitar_flash.load_song_set()
             if self.song_set:
                 self.status_label.setText(f"{len(self.song_set)} músicas carregadas")
             else:
@@ -155,7 +155,7 @@ class GuitarFlashSearchWindow(QtWidgets.QMainWindow):
             )
             return
 
-        results = cli.search_song(term, self.song_set)
+        results = busca_guitar_flash.search_song(term, self.song_set)
         self._fill_table(results)
 
         if results:

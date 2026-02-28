@@ -1,5 +1,3 @@
-import os
-import argparse
 import requests
 from bs4 import BeautifulSoup
 
@@ -14,25 +12,6 @@ RESET = "\033[0m"
 
 BASE_URL = "https://guitarflash.com/custom/lista.asp"
 CSV_PATH = "song_list.csv"
-
-
-def parse_args():
-
-    parser = argparse.ArgumentParser(description="Busca músicas no Guitar Flash")
-    parser.add_argument(
-        "song_name",
-        type=str,
-        help="Nome da música a ser buscada",
-    )
-    parser.add_argument(
-        "--requery",
-        "-r",
-        nargs="?",
-        const=10,
-        type=int,
-        help="Rebuscar a lista de músicas (padrão: 10 páginas)",
-    )
-    return parser.parse_args()
 
 
 def fetch_song_list_html(page: int = 0) -> str:
@@ -90,38 +69,3 @@ def inf_gen(stop=None):
     while stop is None or i < stop:
         yield i
         i += 1
-
-
-def main():
-    args = parse_args()
-    requery = args.requery
-    results: tSongSet = set()
-
-    if requery or not os.path.exists(CSV_PATH):
-        for page in inf_gen(requery):
-            print(f"{BLUE}# Buscando na página {page}...{RESET}")
-            song_list_html = fetch_song_list_html(page)
-            if not song_list_html:
-                break
-            song_set = get_song_set(song_list_html)
-            if not song_set:
-                break
-            results.update(song_set)
-        save_song_set(results)
-    else:
-        results = load_song_set()
-        if not results:
-            return
-
-    if song_name := args.song_name:
-        results = search_song(song_name, results)
-        if results:
-            print(f"{GREEN}Resultados da busca:{RESET}")
-            for song, link in results:
-                print(f"{WHITE}{song}{RESET} {YELLOW}{link}{RESET}")
-        else:
-            print(f"{RED}Nenhuma música encontrada com o nome informado.{RESET}")
-
-
-if __name__ == "__main__":
-    main()
