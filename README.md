@@ -6,7 +6,7 @@ Interface web em Flask para buscar músicas do Guitar Flash, com área administr
 
 - Python 3.11+
 - Dependências em `requirements.txt`
-- Dependência para deploy: `gunicorn` (opcional, mas recomendado para produção)
+- Dependências para windows em `windows-requirements.txt`
 
 ## Executar localmente
 
