@@ -5,9 +5,12 @@ from functools import wraps
 
 from flask import Flask, redirect, render_template, request, session, url_for
 
-import busca_guitar_flash
+from src import busca_guitar_flash
 
-load_dotenv()
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATES_DIR = os.path.join(ROOT_DIR, "templates")
+
+load_dotenv(os.path.join(ROOT_DIR, ".env"))
 
 
 def _get_validated_admin_user() -> str:
@@ -42,7 +45,7 @@ def _get_validated_admin_password() -> str:
     return admin_password
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=TEMPLATES_DIR)
 app.secret_key = secrets.token_urlsafe(32)
 
 ADMIN_USERNAME = _get_validated_admin_user()

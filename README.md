@@ -13,7 +13,7 @@ Interface web em Flask para buscar músicas do Guitar Flash, com área administr
 ```bash
 pip install -r requirements.txt
 copy .env.example .env
-python app.py
+python -m src.app
 ```
 
 Acesse: `http://localhost:5000`
@@ -45,7 +45,7 @@ Esta aplicação está pronta para deploy em serviços que conectam com reposit�
 Configurações recomendadas:
 
 - Build command: `pip install -r requirements.txt`
-- Start command: `gunicorn app:app`
+- Start command: `gunicorn src.app:app`
 - Variáveis de ambiente:
   - `ADMIN_USERNAME`
   - `ADMIN_PASSWORD`
@@ -53,4 +53,4 @@ Configurações recomendadas:
 
 Se a plataforma usar `Procfile`, já existe um arquivo com:
 
-- `web: gunicorn app:app`
+- `web: gunicorn src.app:app`

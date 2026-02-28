@@ -1,3 +1,5 @@
+import os
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -11,7 +13,8 @@ BLUE = "\033[94m"
 RESET = "\033[0m"
 
 BASE_URL = "https://guitarflash.com/custom/lista.asp"
-CSV_PATH = "song_list.csv"
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CSV_PATH = os.path.join(ROOT_DIR, "song_list.csv")
 
 
 def fetch_song_list_html(page: int = 0) -> str:

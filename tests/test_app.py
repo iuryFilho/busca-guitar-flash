@@ -5,7 +5,7 @@ from unittest.mock import patch
 os.environ.setdefault("FLASK_SECRET_KEY", "test-secret-key-with-at-least-32-characters")
 os.environ.setdefault("ADMIN_PASSWORD", "test-admin-password-strong-123")
 
-import app as web_app
+import src.app as web_app
 
 
 class AppHelpersTestCase(unittest.TestCase):
@@ -20,15 +20,14 @@ class AppHelpersTestCase(unittest.TestCase):
 
 
 class AppSecurityTestCase(unittest.TestCase):
-    def test_validated_secret_key_rejects_short_value(self):
-        with patch.dict(os.environ, {"FLASK_SECRET_KEY": "short"}, clear=False):
+    def test_validated_admin_user_rejects_empty_value(self):
+        with patch.dict(os.environ, {"ADMIN_USERNAME": ""}, clear=False):
             with self.assertRaises(RuntimeError):
-                web_app._get_validated_secret_key()
+                web_app._get_validated_admin_user()
 
-    def test_validated_secret_key_accepts_strong_value(self):
-        strong_secret = "strong-secret-key-with-more-than-thirty-two-chars"
-        with patch.dict(os.environ, {"FLASK_SECRET_KEY": strong_secret}, clear=False):
-            self.assertEqual(web_app._get_validated_secret_key(), strong_secret)
+    def test_validated_admin_user_accepts_value(self):
+        with patch.dict(os.environ, {"ADMIN_USERNAME": "bgf-admin"}, clear=False):
+            self.assertEqual(web_app._get_validated_admin_user(), "bgf-admin")
 
     def test_validated_admin_password_rejects_weak_value(self):
         with patch.dict(os.environ, {"ADMIN_PASSWORD": "admin123"}, clear=False):
@@ -51,7 +50,7 @@ class AppRoutesTestCase(unittest.TestCase):
         with self.client.session_transaction() as sess:
             sess["is_admin"] = True
 
-    @patch("app._read_songs")
+    @patch("src.app._read_songs")
     def test_index_renders_song_list(self, mock_read_songs):
         mock_read_songs.return_value = {
             ("Song A", "/song-a"),
@@ -64,7 +63,7 @@ class AppRoutesTestCase(unittest.TestCase):
         self.assertIn(b"Song A", response.data)
         self.assertIn(b"Another Song", response.data)
 
-    @patch("app._read_songs")
+    @patch("src.app._read_songs")
     def test_index_search_filters_results(self, mock_read_songs):
         mock_read_songs.return_value = {
             ("Master of Puppets", "/mop"),
@@ -105,8 +104,8 @@ class AppRoutesTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.location.endswith("/admin/update"))
 
-    @patch("app._refresh_songs")
-    @patch("app._read_songs")
+    @patch("src.app._refresh_songs")
+    @patch("src.app._read_songs")
     def test_admin_update_with_invalid_pages(self, mock_read_songs, mock_refresh_songs):
         mock_read_songs.return_value = {("Song", "/song")}
         self._login_admin_session()
@@ -120,8 +119,8 @@ class AppRoutesTestCase(unittest.TestCase):
         )
         mock_refresh_songs.assert_not_called()
 
-    @patch("app._refresh_songs")
-    @patch("app._read_songs")
+    @patch("src.app._refresh_songs")
+    @patch("src.app._read_songs")
     def test_admin_update_success_message(self, mock_read_songs, mock_refresh_songs):
         mock_read_songs.return_value = {("Song", "/song")}
         mock_refresh_songs.return_value = {

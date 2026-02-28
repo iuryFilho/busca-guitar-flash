@@ -1,6 +1,6 @@
 import unittest
 
-import busca_guitar_flash
+from src import busca_guitar_flash
 
 
 class BuscaGuitarFlashTestCase(unittest.TestCase):
