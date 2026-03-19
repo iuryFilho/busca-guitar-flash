@@ -5,7 +5,7 @@ from functools import wraps
 
 from flask import Flask, redirect, render_template, request, session, url_for
 
-from src import busca_guitar_flash
+import busca_guitar_flash
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(ROOT_DIR, "templates")
@@ -64,22 +64,35 @@ def _read_songs() -> set[tuple[str, str]]:
     return busca_guitar_flash.load_song_set()
 
 
-def _refresh_songs(max_pages: int) -> set[tuple[str, str]]:
-    songs = set()
+def _refresh_songs(max_pages: int) -> tuple[set[tuple[str, str]], int]:
+    songs = busca_guitar_flash.load_song_set()
+    new_last_song = busca_guitar_flash.load_last_song()
+    new_songs_count = 0
     for page in busca_guitar_flash.inf_gen(max_pages):
         html = busca_guitar_flash.fetch_song_list_html(page)
         if not html:
             break
 
-        page_songs = busca_guitar_flash.get_song_set(html)
+        page_songs, found_last_song = busca_guitar_flash.get_song_set(
+            html, new_last_song
+        )
         if not page_songs:
             break
 
+        if page == 0:
+            new_last_song = busca_guitar_flash.get_new_last_song(html)
+            busca_guitar_flash.save_last_song(new_last_song)
+
         songs.update(page_songs)
+        new_songs_count += len(page_songs)
+
+        if found_last_song:
+            print(f"Última música encontrada na página {page}. Parando atualização.")
+            break
 
     if songs:
         busca_guitar_flash.save_song_set(songs)
-    return songs
+    return songs, new_songs_count
 
 
 def _admin_required(view_func):
@@ -158,9 +171,9 @@ def admin_update():
             if pages < 1:
                 raise ValueError
 
-            songs = _refresh_songs(pages)
+            songs, count = _refresh_songs(pages)
             if songs:
-                message = f"Lista atualizada com {len(songs)} músicas."
+                message = f"Lista atualizada com {count} músicas novas ({len(songs)} no total)."
             else:
                 error = "Não foi possível atualizar a lista (sem dados retornados)."
         except ValueError:
