@@ -5,7 +5,10 @@ from functools import wraps
 
 from flask import Flask, redirect, render_template, request, session, url_for
 
-import busca_guitar_flash
+try:
+    import busca_guitar_flash
+except ImportError:
+    from src import busca_guitar_flash
 
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(ROOT_DIR, "templates")
@@ -191,7 +194,7 @@ def admin_update():
 
 
 def main():
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
 
 
 if __name__ == "__main__":
